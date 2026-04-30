@@ -13,11 +13,11 @@ jobs:
         #     git clone https://github.com/${{github.repository}}.git
       - name: install node 20
         uses: actions/setup-node@v6
-        with: 
+        with:
           node-version: 20
       - name: print node version
-        run: node -v    
+        run: node -v
       - name: install dependencies
-        run: npm ci  
-      - name: Run tests  
-        run: npm run test  
+        run: npm ci
+      - name: Run tests
+        run: npm run test
