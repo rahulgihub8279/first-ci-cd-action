@@ -28,24 +28,40 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm run test
+  build:
+      needs: test       
+      runs-on: ubuntu-latest
+      steps:
+        - name: Get Code
+          uses: actions/checkout@v4
+        - name: install node 20
+          uses: actions/setup-node@v6
+          with:
+            node-version: 20
+        - name: Cache Dependencies
+          uses: actions/cache@v5
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        - name: install dependencies
+          run: npm ci
+        - name: Build project
+          run: npm run build
+        - name: upload artifact
+          uses: actions/upload-artifact@v7
+          with:
+            name: dist-files
+            path: dist 
+            
   deploy:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v4
-      - name: install node 20
-        uses: actions/setup-node@v6
+    steps: 
+      - name: download artifact
+        uses: actions/download-artifact@v8
         with:
-          node-version: 20
-      - name: Cache Dependencies
-        uses: actions/cache@v5
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - name: install dependencies
-        run: npm ci
-      - name: Build project
-        run: npm run build
+          name: dist-files
+          path: dist 
       - name: deploy
         run: echo "Deploy successfully"
+        
